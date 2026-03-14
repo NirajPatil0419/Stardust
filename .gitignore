@@ -1,0 +1,4 @@
+# ignore uncleaned datasets
+data/raw/*
+data/processed/*
+data/interim/*
