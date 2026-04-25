@@ -11,6 +11,7 @@ easier to update, and more professional.
 
 # Hugging Face Whisper model to use
 WHISPER_MODEL_NAME = "openai/whisper-small"
+# WHISPER_MODEL_NAME = "openai/whisper-tiny"
 
 # Language settings
 ENGLISH_LANGUAGE_CODE = "en"
@@ -33,3 +34,9 @@ TARGET_CHANNELS = 1
 # Paths
 ENGLISH_STANDARDIZED_MANIFEST = "data/processed/english/manifest_standardized.csv"
 HINDI_STANDARDIZED_MANIFEST = "data/processed/hindi/manifest_standardized.csv"
+
+CHECKPOINT_DIR = "models/checkpoints"
+TRAINING_LOG_DIR = "logs/training"
+
+SAVE_MODEL_AFTER_DEBUG_RUN = True
+MAX_DEBUG_STEPS = 5
