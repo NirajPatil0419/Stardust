@@ -1,4 +1,5 @@
 from transformers import WhisperProcessor
+from config.model_config import WHISPER_MODEL_NAME
 
 
 # Global model identifier
