@@ -36,20 +36,39 @@ def main():
     model.train()
 
     print("Loading dataset...")
-    dataset = WhisperFeatureDataset(
+    # TRAIN DATASET
+
+    train_dataset = WhisperFeatureDataset(
         manifest_path=ENGLISH_STANDARDIZED_MANIFEST,
         language="en",
         task="transcribe",
+        split="train",
     )
 
-    print(f"Dataset size: {len(dataset)}")
+    #  VALIDATION DATASET
+    val_dataset = WhisperFeatureDataset(
+        manifest_path=ENGLISH_STANDARDIZED_MANIFEST,
+        language="en",
+        task="transcribe",
+        split="dev",
+    )
 
     dataloader = DataLoader(
-        dataset,
+        train_dataset,
         batch_size=BATCH_SIZE,
         shuffle=True,
         collate_fn=whisper_feature_collate_fn,
     )
+
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        collate_fn=whisper_feature_collate_fn,
+    )
+
+    print(f"Train dataset size: {len(train_dataset)}")
+    print(f"Validation dataset size: {len(val_dataset)}")
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
 
@@ -110,6 +129,37 @@ def main():
 
             # Debug stop
             if step == MAX_DEBUG_STEPS:
+                print("\nRunning validation...")
+
+                model.eval()
+
+                val_loss_total = 0
+                val_steps = 0
+
+                with torch.no_grad():
+                    for val_batch in val_loader:
+                        val_input_features = val_batch["input_features"].to(device)
+                        val_labels = val_batch["labels"].to(device)
+
+                        val_outputs = model(
+                            input_features=val_input_features,
+                            labels=val_labels,
+                        )
+
+                        val_loss = val_outputs.loss
+                        val_loss_total += val_loss.item()
+                        val_steps += 1
+
+                        print(f"Validation Step {val_steps} | Loss: {val_loss.item():.4f}")
+
+                        # if val_steps == 5:
+                        #     break
+
+                avg_val_loss = val_loss_total / val_steps
+                print(f"Average Validation Loss: {avg_val_loss:.4f}")
+
+                model.train()
+
                 total_time = time.time() - training_start_time
                 avg_time = total_time / (step + 1)
 

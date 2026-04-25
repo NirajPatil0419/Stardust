@@ -28,6 +28,7 @@ class WhisperFeatureDataset(Dataset):
         manifest_path: str,
         language: str = "en",
         task: str = "transcribe",
+        split: str = None,
     ):
         """
         Initialize the dataset.
@@ -48,6 +49,9 @@ class WhisperFeatureDataset(Dataset):
             raise FileNotFoundError(f"Manifest not found: {self.manifest_path}")
 
         self.df = pd.read_csv(self.manifest_path)
+        
+        if split:
+            self.df = self.df[self.df["split"] == split].reset_index(drop=True) 
 
         required_columns = {
             "language",
